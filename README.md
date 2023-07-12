@@ -21,9 +21,9 @@
 
 Найти docker-контейнер с готовым микросервисом можно [здесь](https://hub.docker.com/repository/docker/darveivoldavara/ocr_for_medical_certificates/)
 
-Скачать: `docker pull darveivoldavara/ocr_for_medical_certificates:ocr_certificates`
+Скачать: `docker pull darveivoldavara/ocr_for_medical_certificates:v1`
 
-Запустить: `docker run --rm --name ocr_for_medical_certificates -p 8501:8501 ocr_certificates:v1`
+Запустить: `docker run -p 8501:8501 84f61c063653`
 
 ---
 
