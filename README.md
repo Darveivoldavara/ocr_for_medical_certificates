@@ -12,6 +12,7 @@
 ## Итог работы
 
 Готовый микросервис для распознавания нужной информации.
+
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.879**
 
 ---
@@ -21,6 +22,7 @@
 Найти docker-контейнер с готовым микросервисом можно [здесь](https://hub.docker.com/repository/docker/darveivoldavara/ocr_for_medical_certificates/)
 
 Скачать: `docker pull darveivoldavara/ocr_for_medical_certificates:ocr_certificates`
+
 Запустить: `docker run --rm --name ocr_for_medical_certificates -p 8501:8501 ocr_certificates:v1`
 
 ---
