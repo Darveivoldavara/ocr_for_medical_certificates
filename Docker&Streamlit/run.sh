@@ -1,0 +1,1 @@
+docker run --rm --name ocr_for_medical_certificates -p 8501:8501 ocr_certificates:v1
