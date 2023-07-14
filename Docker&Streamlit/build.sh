@@ -1,1 +1,1 @@
-docker build -t ocr_certificates:v1 .
+docker build -t ocr_certificates:v2 .
