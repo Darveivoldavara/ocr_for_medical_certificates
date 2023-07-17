@@ -19,11 +19,11 @@
 
 ### Загрузка сервиса (Docker)
 
-Найти docker-контейнер с готовым микросервисом можно [здесь](https://hub.docker.com/repository/docker/darveivoldavara/ocr_for_medical_certificates/).
+Найти docker-контейнер с готовым микросервисом можно [здесь](https://hub.docker.com/r/rookblack/ocr_donor).
 
-Скачать: `docker pull darveivoldavara/ocr_for_medical_certificates:v1`
+Скачать: `docker pull rookblack/ocr_donor:latest`
 
-Запустить: `docker run -p 8501:8501 84f61c063653`
+Запустить: `docker run -p 8000:8000 rookblack/ocr_donor`
 
 ---
 
