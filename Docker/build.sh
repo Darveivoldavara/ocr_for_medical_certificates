@@ -1,1 +1,1 @@
-docker build -t ocr_certificates:v2 .
+docker build -t rookblack/ocr_donor .
