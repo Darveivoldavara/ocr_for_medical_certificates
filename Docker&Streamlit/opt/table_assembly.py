@@ -13,69 +13,104 @@ def assembly(lst):
         if re.match(
             r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$',
             lst[i]
-        ) and i+2 < len(lst) and re.match(r'\w+[\W_]?', lst[i+1]):
+        ) and i+2 < len(lst) and re.match(
+            r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$',
+            lst[i+1]
+        ):
             date_parts = re.findall(r'(\d{2})[\W_]*(\d{2})', lst[i])[0]
             year = '20' + re.findall(r'(\d{2})', lst[i])[-1]
             date = f'{date_parts[0]}.{date_parts[1]}.{year}'
-            if re.match(r'\w+[\W_]\w+[\W_]', lst[i+1]):
-                donation_type = re.findall(r'\w+', lst[i+1])[0].lower()
-                is_paid = re.findall(r'[\W_]\w+[\W_]', lst[i+1])[0].lower()
+            if re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]$', lst[i+1]):
+                donation_type = re.findall(
+                    r'\w{1,2}[\W_]?\w{,2}',
+                    lst[i+1]
+                )[0].lower()
+                is_paid = re.findall(
+                    r'[\W_]?\w{,4}[\W_]$',
+                    lst[i+1]
+                )[0].lower()
                 i += 2
-            else:
+            elif re.match(r'^[\W_]?\w{1,4}[\W_]?$', lst[i+2]):
                 donation_type = lst[i+1].lower()
                 is_paid = lst[i+2].lower()
                 i += 3
+            else:
+                date = None
 
         elif re.match(r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*$', lst[i]) \
                 and i+3 < len(lst) \
                 and re.match(r'^[\W_]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$', lst[i+1]) \
-                and re.match(r'\w+[\W_]?', lst[i+2]):
+                and re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$', lst[i+2]):
             date_parts = re.findall(
                 r'(\d{2})[\W_]*(\d{2})', lst[i]+lst[i+1])[0]
             year = '20' + re.findall(r'(\d{2})', lst[i+1])[-1]
             date = f'{date_parts[0]}.{date_parts[1]}.{year}'
-            if re.match(r'\w+[\W_]\w+[\W_]', lst[i+2]):
-                donation_type = re.findall(r'\w+', lst[i+2])[0].lower()
-                is_paid = re.findall(r'[\W_]\w+[\W_]', lst[i+2])[0].lower()
+            if re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]$', lst[i+2]):
+                donation_type = re.findall(
+                    r'\w{1,2}[\W_]?\w{,2}',
+                    lst[i+2]
+                )[0].lower()
+                is_paid = re.findall(
+                    r'[\W_]?\w{,4}[\W_]$',
+                    lst[i+2]
+                )[0].lower()
                 i += 3
-            else:
+            elif re.match(r'^[\W_]?\w{1,4}[\W_]?$', lst[i+3]):
                 donation_type = lst[i+2].lower()
                 is_paid = lst[i+3].lower()
                 i += 4
+            else:
+                date = None
 
         elif re.match(r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*$', lst[i]) \
                 and i+3 < len(lst) \
                 and re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', lst[i+1]) \
-                and re.match(r'\w+[\W_]?', lst[i+2]):
+                and re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$', lst[i+2]):
             date_parts = re.findall(r'(\d{2})[\W_]*(\d{2})', lst[i])[0]
             year = '20' + re.findall(r'(\d{2})', lst[i+1])[-1]
             date = f'{date_parts[0]}.{date_parts[1]}.{year}'
-            if re.match(r'\w+[\W_]\w+[\W_]', lst[i+2]):
-                donation_type = re.findall(r'\w+', lst[i+2])[0].lower()
-                is_paid = re.findall(r'[\W_]\w+[\W_]', lst[i+2])[0].lower()
+            if re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]$', lst[i+2]):
+                donation_type = re.findall(
+                    r'\w{1,2}[\W_]?\w{,2}',
+                    lst[i+2]
+                )[0].lower()
+                is_paid = re.findall(
+                    r'[\W_]?\w{,4}[\W_]$',
+                    lst[i+2]
+                )[0].lower()
                 i += 3
-            else:
+            elif re.match(r'^[\W_]?\w{1,4}[\W_]?$', lst[i+3]):
                 donation_type = lst[i+2].lower()
                 is_paid = lst[i+3].lower()
                 i += 4
+            else:
+                date = None
 
         elif re.match(r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*$', lst[i]) \
                 and i+4 < len(lst) \
                 and re.match(r'^[\W_]*\d{2}[\W_]*$', lst[i+1]) \
                 and re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', lst[i+2]) \
-                and re.match(r'\w+[\W_]?', lst[i+3]):
+                and re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$', lst[i+3]):
             date_parts = re.findall(
                 r'(\d{2})[\W_]*(\d{2})', lst[i]+lst[i+1])[0]
             year = '20' + re.findall(r'(\d{2})', lst[i+2])[-1]
             date = f'{date_parts[0]}.{date_parts[1]}.{year}'
-            if re.match(r'\w+[\W_]\w+[\W_]', lst[i+3]):
-                donation_type = re.findall(r'\w+', lst[i+3])[0].lower()
-                is_paid = re.findall(r'[\W_]\w+[\W_]', lst[i+3])[0].lower()
+            if re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]$', lst[i+3]):
+                donation_type = re.findall(
+                    r'\w{1,2}[\W_]?\w{,2}',
+                    lst[i+3]
+                )[0].lower()
+                is_paid = re.findall(
+                    r'[\W_]?\w{,4}[\W_]$',
+                    lst[i+3]
+                )[0].lower()
                 i += 4
-            else:
+            elif re.match(r'^[\W_]?\w{1,4}[\W_]?$', lst[i+4]):
                 donation_type = lst[i+3].lower()
                 is_paid = lst[i+4].lower()
                 i += 5
+            else:
+                date = None
 
         if donation_type:
             if 't' in donation_type:
@@ -88,13 +123,14 @@ def assembly(lst):
                     or 'm' in donation_type \
                     or 'v' in donation_type:
                 donation_type = 'Плазма'
-            else:
+            elif re.search(r'[a-z]', donation_type) \
+                    or len(re.findall(r'\d', donation_type)) < 2:
                 donation_type = None
 
         if is_paid:
-            if 0 < len(re.findall(r'[a-z0-9]', is_paid)) < 4:
+            if 0 < len(re.findall(r'[a-z0-9]', is_paid)) < 3:
                 is_paid = 'Безвозмездно'
-            elif 3 < len(re.findall(r'[a-z0-9]', is_paid)) < 6 \
+            elif 2 < len(re.findall(r'[a-z0-9]', is_paid)) < 5 \
                     and ('n' in is_paid or 't' in is_paid):
                 is_paid = 'Платно'
             elif len(re.findall(r'[a-z0-9]', is_paid)) > 14 \
@@ -103,22 +139,38 @@ def assembly(lst):
                 is_paid = None
 
         if (
+            re.match(r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*$', str(is_paid)) or
             re.match(
-                r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$',
-                str(is_paid)
-            ) or re.match(r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*$', str(is_paid))
-            or re.match(
-                r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*$',
-                str(is_paid)
-            )) and i+1 < len(lst) and (
-            re.match(r'\w+[\W_]?', str(lst[i]))
-            or re.match(r'^[\W_]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$', str(lst[i]))
-            or re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', str(lst[i])
-                        )):
+                r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*$', str(is_paid))
+        ) and i+1 < len(lst) and (
+            re.match(r'^[\W_]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$', lst[i]) or
+            re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', lst[i])
+        ):
             i -= 1
             continue
 
-        if date or donation_type or is_paid:
+        if (
+            re.match(
+                r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$',
+            str(donation_type)
+          ) or
+          re.match(
+              r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*$',
+              str(donation_type)
+          ) or
+          re.match(
+              r'^[^\w\s\(\)]*\d{2}[^\w\s\(\)]*\d{2}[\W_]*$',
+            str(donation_type)
+          )
+        ) and i+1 < len(lst) and (
+            re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$', is_paid) or
+            re.match(r'^[\W_]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$', is_paid) or
+            re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', is_paid)
+        ):
+            i -= 2
+            continue
+
+        if date:
             df.loc[len(df)] = [date, donation_type, is_paid]
         else:
             i += 1
@@ -143,6 +195,7 @@ def assembly(lst):
         'is_paid': 'Безвозмездно',
         'donation_type': 'Цельная кровь'
     })
+
     df.columns = ['Дата донации', 'Класс крови', 'Тип донации']
 
     return df
