@@ -15,7 +15,7 @@
 
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.91**.
 
-Описание работы и тестирование можно увидеть в [Jupiter-тетрадке](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/main/Doctr).
+Описание работы и тестирование можно увидеть в [Jupiter-тетрадке](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/Doctr/ocr_for_medical_certificates.ipynb).
 
 ---
 
