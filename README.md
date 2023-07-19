@@ -15,6 +15,8 @@
 
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.91**.
 
+Описание работы и тестирование можно увидеть в [Jupiter-тетрадке](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/main/Doctr).
+
 ---
 
 ### Загрузка сервиса (Docker)
@@ -24,6 +26,8 @@
 Скачать: `docker pull rookblack/ocr_donor:latest`
 
 Запустить: `docker run -p 8000:8000 rookblack/ocr_donor`
+
+[Файлы для самостоятельной сборки контейнера](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/main/Docker).
 
 ---
 
