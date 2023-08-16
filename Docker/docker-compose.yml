@@ -2,20 +2,14 @@ version: '3.8'
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
+    image: docker_web:latest
     ports:
       - "8000:8000"
     depends_on:
       - redis
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
+    image: docker_worker:latest
     depends_on:
       - redis
   redis:
-    build:
-      context: .
-      dockerfile: Dockerfile.redis
+    image: docker_redis:latest
