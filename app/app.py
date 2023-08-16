@@ -5,39 +5,41 @@ from typing import List
 
 from doctr.io import DocumentFile
 from celery import Celery
+from celery.signals import setup_logging
 from fastapi import FastAPI, File, UploadFile, Form, Depends
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
 
 import table_assembly
 
 
-logging.basicConfig(level=logging.INFO, filename="logs.log", filemode="w",
-                    format="%(asctime)s %(levelname)s %(message)s")
-
 app = FastAPI()
-celery_app = Celery("worker", broker="redis://redis:6379/0")
+celery_app = Celery("worker", broker="redis://redis:6380/0",
+                    backend="redis://redis")
+celery_app.conf.update({'worker_hijack_root_logger': False})
+
 model = None
 
 
-class Model(BaseModel):
-    model: any
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler = logging.FileHandler("logs.log")
+file_handler.setFormatter(formatter)
+root_logger.addHandler(file_handler)
 
-
-async def get_model():
-    return Model(model=model)
+root_logger = logging.getLogger(__name__)
 
 
 @app.on_event("startup")
 async def startup_event():
     global model
-    model = pickle.load(
-        open(os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"))
-    logging.info("Model loaded successfully")
-
-
-class TaskResult(BaseModel):
-    task_id: str
+    try:
+        model = pickle.load(
+            open(os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"))
+        logging.info("Model loaded successfully")
+    except Exception as e:
+        logging.error(f"Error while loading model: {e}")
 
 
 @app.get("/")
@@ -53,7 +55,7 @@ def main():
     return HTMLResponse(content=html_content)
 
 
-@app.post("/ocr", response_model=TaskResult)
+@app.post("/ocr")
 def process_request(file: UploadFile):
     task = process_file.delay(file.file.read())
     logging.info(f"Task {task.id} sent to Celery")
