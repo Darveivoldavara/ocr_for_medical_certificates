@@ -8,3 +8,4 @@ altair==4.2.0
 rapidfuzz==2.15.1
 celery[redis]==5.3.1
 redis==5.0.0
+python-multipart==0.0.6
