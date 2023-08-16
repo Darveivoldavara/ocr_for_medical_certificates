@@ -1,1 +1,0 @@
-docker build -t docker_web -f Dockerfile.web ../
