@@ -20,13 +20,15 @@ celery_app.conf.update({'worker_hijack_root_logger': False})
 model = None
 
 
-root_logger = logging.getLogger(__name__)
+root_logger = logging.getLogger()
 root_logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler = logging.FileHandler("logs.log")
 file_handler.setFormatter(formatter)
 root_logger.addHandler(file_handler)
+
+root_logger = logging.getLogger(__name__)
 
 
 @app.on_event("startup")
