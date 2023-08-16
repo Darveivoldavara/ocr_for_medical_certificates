@@ -13,7 +13,7 @@ import table_assembly
 
 
 app = FastAPI()
-celery_app = Celery("worker", broker="redis://redis:6380/0",
+celery_app = Celery("worker", broker="redis://redis:6379/0",
                     backend="redis://redis")
 celery_app.conf.update({'worker_hijack_root_logger': False})
 
