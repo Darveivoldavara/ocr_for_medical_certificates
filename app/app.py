@@ -17,29 +17,22 @@ celery_app = Celery("worker", broker="redis://redis:6379/0",
                     backend="redis://redis")
 celery_app.conf.update({'worker_hijack_root_logger': False})
 
-model = None
 
-
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler = logging.FileHandler("logs.log")
+file_handler = logging.FileHandler("logs.log", mode="w")
 file_handler.setFormatter(formatter)
-root_logger.addHandler(file_handler)
-
-root_logger = logging.getLogger(__name__)
+logger.addHandler(file_handler)
 
 
-@app.on_event("startup")
-async def startup_event():
-    global model
-    try:
-        model = pickle.load(
-            open(os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"))
-        logging.info("Model loaded successfully")
-    except Exception as e:
-        logging.error(f"Error while loading model: {e}")
+try:
+    model = pickle.load(
+        open(os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"))
+    logging.info("Model loaded successfully")
+except Exception as e:
+    logging.error(f"Error while loading model: {e}")
 
 
 @app.get("/")
