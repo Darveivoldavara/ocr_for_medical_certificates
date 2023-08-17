@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   web:
-    image: docker_web:latest
+    image: rookblack/ocr_donor:web
     ports:
       - "8000:8000"
     depends_on:
       - redis
   worker:
-    image: docker_worker:latest
+    image: rookblack/ocr_donor:worker
     depends_on:
       - redis
   redis:
-    image: docker_redis:latest
+    image: rookblack/ocr_donor:redis
