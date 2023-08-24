@@ -15,13 +15,14 @@ import table_assembly
 app = FastAPI()
 celery_app = Celery("worker", broker="redis://redis:6379/0",
                     backend="redis://redis")
-celery_app.conf.update({'worker_hijack_root_logger': False})
+celery_app.conf.update({"worker_hijack_root_logger": False})
+allowed_extensions = ["jpg", "jpeg", "png"]
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler = logging.FileHandler("logs.log", mode="w")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -48,9 +49,20 @@ def main():
     return HTMLResponse(content=html_content)
 
 
+@app.get("/health")
+def health():
+    return {"status": "OK"}
+
+
 @app.post("/ocr")
 def process_request(file: UploadFile):
-    task = process_file.delay(file.file.read())
+    file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
+    if file_ext not in allowed_extensions:
+        logging.info(
+            f'{file.filename} has an unsupported format. Allowed formats are: {", ".join(allowed_extensions)}')
+        return f"Wrong file format. Allowed formats are: {', '.join(allowed_extensions)}"
+    logging.info(f"Received file: {file.filename}")
+    task = process_file.delay(file.file.read(), file_name)
     logging.info(f"Task {task.id} sent to Celery")
     return {"task_id": task.id}
 
@@ -68,7 +80,7 @@ def get_result(task_id: str):
 
 
 @celery_app.task(name="process_file")
-def process_file(file_content: bytes):
+def process_file(file_content: bytes, file_name: str):
     try:
         save_pth = os.path.join(os.path.dirname(__file__), "img", "img.jpg")
         with open(save_pth, "wb") as fid:
@@ -84,6 +96,20 @@ def process_file(file_content: bytes):
                     lst.append(w["value"])
 
         df = table_assembly.assembly(lst)
+        df[[
+            "blood_station_id",
+            "plan_date",
+            "email",
+            "is_out",
+            "volume",
+            "payment_cost",
+            "city_id",
+            "first_name",
+            "middle_name",
+            "last_name"
+        ]] = ""
+        df["image_id"] = file_name
+        df["with_image"] = True
 
         logging.info(
             f'Result: {df.to_json(orient="records", force_ascii=False)}')
