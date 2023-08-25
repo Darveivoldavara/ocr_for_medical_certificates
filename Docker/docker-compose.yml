@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   web:
-    image: rookblack/ocr_donor:web
+    image: darveivoldavara/ocr_for_medical_certificates:web
     ports:
       - "8000:8000"
     depends_on:
       - redis
   worker:
-    image: rookblack/ocr_donor:worker
+    image: darveivoldavara/ocr_for_medical_certificates:worker
     depends_on:
       - redis
   redis:
-    image: rookblack/ocr_donor:redis
+    image: darveivoldavara/ocr_for_medical_certificates:redis
