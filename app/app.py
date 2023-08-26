@@ -16,7 +16,7 @@ app = FastAPI()
 celery_app = Celery("worker", broker="redis://redis:6379/0",
                     backend="redis://redis")
 celery_app.conf.update({"worker_hijack_root_logger": False})
-allowed_extensions = ["jpg", "jpeg", "png"]
+allowed_extensions = ["jpg", "jpeg", "png", "raw", "psd", "bmp"]
 
 
 logger = logging.getLogger()
