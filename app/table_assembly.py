@@ -114,25 +114,25 @@ def assembly(lst):
 
         if donation_type:
             if 't' in donation_type:
-                donation_type = 'Тромбоциты'
+                donation_type = 'platelets'
             elif 'k' in donation_type \
                     or 'w' in donation_type \
                     or 'p' in donation_type:
-                donation_type = 'Цельная кровь'
+                donation_type = 'blood'
             elif 'n' in donation_type \
                     or 'm' in donation_type \
                     or 'v' in donation_type:
-                donation_type = 'Плазма'
+                donation_type = 'plasma'
             elif re.search(r'[a-z]', donation_type) \
                     or len(re.findall(r'\d', donation_type)) < 2:
                 donation_type = None
 
         if is_paid:
             if 0 < len(re.findall(r'[a-z0-9]', is_paid)) < 3:
-                is_paid = 'Безвозмездно'
+                is_paid = 'free'
             elif 2 < len(re.findall(r'[a-z0-9]', is_paid)) < 5 \
                     and ('n' in is_paid or 't' in is_paid):
-                is_paid = 'Платно'
+                is_paid = 'payed'
             elif len(re.findall(r'[a-z0-9]', is_paid)) > 14 \
                     or len(re.findall(r'[a-z0-9]', is_paid)) == 0 \
                     or len(re.findall(r'\d', is_paid)) < 6:
@@ -186,16 +186,15 @@ def assembly(lst):
     invalid_rows['date'] = date_copy[df['date'].isna()]
     df = df[~df['date'].isna()]
     df = df.sort_values(by='date')
-    df['date'] = df['date'].dt.strftime('%d.%m.%Y')
     for idx, row in invalid_rows.iterrows():
         df = pd.concat([df.iloc[:idx], row.to_frame().T,
                        df.iloc[idx:]]).reset_index(drop=True)
 
     df = df.fillna(value={
-        'is_paid': 'Безвозмездно',
-        'donation_type': 'Цельная кровь'
+        'is_paid': 'free',
+        'donation_type': 'blood'
     })
 
-    df.columns = ['Дата донации', 'Класс крови', 'Тип донации']
+    df.columns = ['donate_at', 'blood_class', 'payment_type']
 
     return df
