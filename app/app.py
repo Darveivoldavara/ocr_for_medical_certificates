@@ -3,6 +3,10 @@ import logging
 import pickle
 from typing import List
 
+from PIL import Image
+from torch import no_grad
+from torchvision import transforms
+
 from doctr.io import DocumentFile
 from celery import Celery
 from celery.signals import setup_logging
@@ -29,11 +33,47 @@ logger.addHandler(file_handler)
 
 
 try:
-    model = pickle.load(
-        open(os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"))
+    model = pickle.load(open(
+        os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"
+    ))
     logging.info("Model loaded successfully")
 except Exception as e:
     logging.error(f"Error while loading model: {e}")
+
+try:
+    encoder = pickle.load(open(
+        os.path.join(os.path.dirname(__file__), "beit_encoder.pkl"), "rb"
+    ))
+    logging.info("Encoder loaded successfully")
+except Exception as e:
+    logging.error(f"Error while loading encoder: {e}")
+
+try:
+    classifier = pickle.load(open(
+        os.path.join(os.path.dirname(__file__), "skorch_ffnn_classifier.pkl"),
+        "rb"
+    ))
+    logging.info("Classifier loaded successfully")
+except Exception as e:
+    logging.error(f"Error while loading classifier: {e}")
+
+
+def obtaining_embedding(img_path):
+    preprocess = transforms.Compose([
+        transforms.Resize(384),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.5, 0.5, 0.5],
+            std=[0.5, 0.5, 0.5]
+        )
+    ])
+    image = Image.open(img_path).convert('RGB')
+    image = preprocess(image).unsqueeze(0)
+    with no_grad():
+        output = encoder(image)
+        embedding = output[0][:, 0, :]
+    return embedding
 
 
 @app.get("/")
@@ -58,11 +98,20 @@ def health():
 def process_request(file: UploadFile):
     file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
     if file_ext not in allowed_extensions:
-        logging.info(
+        logging.error(
             f'{file.filename} has an unsupported format. Allowed formats are: {", ".join(allowed_extensions)}')
         return f"Wrong file format. Allowed formats are: {', '.join(allowed_extensions)}"
     logging.info(f"Received file: {file.filename}")
-    task = process_file.delay(file.file.read(), file_name)
+
+    save_path = os.path.join(os.path.dirname(__file__), "img", file.filename)
+    with open(save_path, "wb") as fid:
+        fid.write(file.file.read())
+    if not classifier.predict(obtaining_embedding(save_path)):
+        logging.error(
+            f"The uploaded image is not a medical certificate of form 405. The service only works with them")
+        return f"The uploaded image is not a medical certificate of form 405. The service only works with them"
+
+    task = process_file.delay(save_path, file_name)
     logging.info(f"Task {task.id} sent to Celery")
     return {"task_id": task.id}
 
@@ -80,13 +129,9 @@ def get_result(task_id: str):
 
 
 @celery_app.task(name="process_file")
-def process_file(file_content: bytes, file_name: str):
+def process_file(file_path: str, file_name: str):
     try:
-        save_pth = os.path.join(os.path.dirname(__file__), "img", "img.jpg")
-        with open(save_pth, "wb") as fid:
-            fid.write(file_content)
-
-        image = DocumentFile.from_images(f"{save_pth}")
+        image = DocumentFile.from_images(file_path)
         result = model(image)
         jsn = result.pages[0].export()
         lst = []
