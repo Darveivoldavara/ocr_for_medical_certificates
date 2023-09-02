@@ -4,7 +4,7 @@ import pickle
 from typing import List
 
 from PIL import Image
-from torch import no_grad
+import torch
 from torchvision import transforms
 
 from doctr.io import DocumentFile
@@ -14,7 +14,7 @@ from fastapi import FastAPI, File, UploadFile, Form, Depends
 from fastapi.responses import HTMLResponse
 
 import table_assembly
-
+from net import Net
 
 app = FastAPI()
 celery_app = Celery("worker", broker="redis://redis:6379/0",
@@ -70,7 +70,7 @@ def obtaining_embedding(img_path):
     ])
     image = Image.open(img_path).convert('RGB')
     image = preprocess(image).unsqueeze(0)
-    with no_grad():
+    with torch.no_grad():
         output = encoder(image)
         embedding = output[0][:, 0, :]
     return embedding
