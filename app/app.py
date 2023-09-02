@@ -106,7 +106,7 @@ def process_request(file: UploadFile):
     save_path = os.path.join(os.path.dirname(__file__), "img", file.filename)
     with open(save_path, "wb") as fid:
         fid.write(file.file.read())
-    if not classifier.predict(obtaining_embedding(save_path)):
+    if not classifier.predict(obtaining_embedding(save_path))[0]:
         logging.error(
             f"The uploaded image is not a medical certificate of form 405. The service only works with them")
         return f"The uploaded image is not a medical certificate of form 405. The service only works with them"
