@@ -7,9 +7,18 @@ services:
       - "8000:8000"
     depends_on:
       - redis
+    volumes:
+      - app-data:/app/img
+
   worker:
     image: darveivoldavara/ocr_for_medical_certificates:worker
     depends_on:
       - redis
+    volumes:
+      - app-data:/app/img
+      
   redis:
     image: darveivoldavara/ocr_for_medical_certificates:redis
+
+volumes:
+  app-data:

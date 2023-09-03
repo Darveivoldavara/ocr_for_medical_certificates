@@ -186,6 +186,7 @@ def assembly(lst):
     invalid_rows['date'] = date_copy[df['date'].isna()]
     df = df[~df['date'].isna()]
     df = df.sort_values(by='date')
+    df['date'] = df['date'].dt.strftime('%Y-%m-%d')
     for idx, row in invalid_rows.iterrows():
         df = pd.concat([df.iloc[:idx], row.to_frame().T,
                        df.iloc[idx:]]).reset_index(drop=True)
