@@ -13,7 +13,11 @@
 
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.91**.
 
-Описание работы и тестирование, в том числе с интерактивным графиком, можно увидеть в [Jupiter-тетрадке](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/6714f0dfc44e341a01c33353a9cf2db2719aa032/Doctr/ocr_for_medical_certificates.ipynb) на nbviewer.
+Описания работы и тестирования, в том числе с интерактивными графиками, можно увидеть в Jupiter-тетрадкеах на nbviewer:
+
+[OCR](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/6714f0dfc44e341a01c33353a9cf2db2719aa032/Doctr/ocr_for_medical_certificates.ipynb)
+
+[Классификация](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/712c639362d1ced47b364f3e92a98b8f0d621017/notebooks/certificates_classifier.ipynb)
 
 ---
 
