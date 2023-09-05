@@ -19,15 +19,15 @@
 
 ### Загрузка сервиса (Docker)
 
-Найти docker-контейнеры для микросервиса можно [здесь](https://hub.docker.com/r/rookblack/ocr_donor).
+Найти docker-контейнеры для микросервиса можно [здесь](https://hub.docker.com/r/darveivoldavara/ocr_for_medical_certificates).
 
 Скачать:
 
-`docker pull rookblack/ocr_donor:web`
+`docker pull darveivoldavara/ocr_for_medical_certificates:web`
 
-`docker pull rookblack/ocr_donor:redis`
+`docker pull darveivoldavara/ocr_for_medical_certificates:redis`
 
-`docker pull rookblack/ocr_donor:worker`
+`docker pull darveivoldavara/ocr_for_medical_certificates:worker`
 
 Запустить:
 
@@ -45,6 +45,7 @@
 | **13.07.2023** | **0.904** | **адаптация скрипта к результатам работы новых моделей** |
 | **16.07.2023** | **0.91** | **финальный дебаг скрипта** |
 | **17.08.2023** | **0.91** | **реализована асинхронная работа сервиса** |
+| **04.09.2023** | **0.91** | **добавлена частичная классификация справок на входе** |
 
 ---
 
@@ -70,8 +71,4 @@
 
 ### Статус проекта
 
-В процессе доработка формата вывода OCR-распознавания.
-
 В планах реализация обработки дополнительных типов справок с соответствующим классификатором.
-
-Прогресс можно увидеть в соответствующей [ветке](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/async).
