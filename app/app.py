@@ -16,9 +16,13 @@ from fastapi.responses import HTMLResponse
 import table_assembly
 from net import Net
 
+
+REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL", "redis://redis:6379/0")
+REDIS_BACKEND_URL = os.environ.get("REDIS_BACKEND_URL", "redis://redis")
+
 app = FastAPI()
-celery_app = Celery("worker", broker="redis://redis:6379/0",
-                    backend="redis://redis")
+celery_app = Celery("worker", broker=REDIS_BROKER_URL,
+                    backend=REDIS_BACKEND_URL)
 celery_app.conf.update({"worker_hijack_root_logger": False})
 allowed_extensions = ["jpg", "jpeg", "png", "raw", "psd", "bmp"]
 
