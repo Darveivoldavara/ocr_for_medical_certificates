@@ -43,6 +43,7 @@ try:
     logging.info("Model loaded successfully")
 except Exception as e:
     logging.error(f"Error while loading model: {e}")
+    raise e
 
 try:
     encoder = pickle.load(open(
@@ -51,6 +52,7 @@ try:
     logging.info("Encoder loaded successfully")
 except Exception as e:
     logging.error(f"Error while loading encoder: {e}")
+    raise e
 
 try:
     classifier = pickle.load(open(
@@ -60,6 +62,7 @@ try:
     logging.info("Classifier loaded successfully")
 except Exception as e:
     logging.error(f"Error while loading classifier: {e}")
+    raise e
 
 
 def obtaining_embedding(img_path):
@@ -102,7 +105,7 @@ def health():
 def process_request(file: UploadFile):
     file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
     if file_ext not in allowed_extensions:
-        logging.error(
+        logging.warning(
             f'{file.filename} has an unsupported format. Allowed formats are: {", ".join(allowed_extensions)}')
         return f"Wrong file format. Allowed formats are: {', '.join(allowed_extensions)}"
     logging.info(f"Received file: {file.filename}")
@@ -111,7 +114,7 @@ def process_request(file: UploadFile):
     with open(save_path, "wb") as fid:
         fid.write(file.file.read())
     if not classifier.predict(obtaining_embedding(save_path))[0]:
-        logging.error(
+        logging.warning(
             f"The uploaded image is not a medical certificate of form 405. The service only works with them")
         return f"The uploaded image is not a medical certificate of form 405. The service only works with them"
 
