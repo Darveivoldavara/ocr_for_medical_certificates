@@ -31,7 +31,7 @@
 
 Запустить:
 
-[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/async/Docker/docker-compose.yml).
+[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/async/docker/docker-compose.yml).
 
 ---
 
