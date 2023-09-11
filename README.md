@@ -35,6 +35,16 @@
 
 ---
 
+### Клонирование репозитория
+
+Если потребуется собирать самостоятельно образы, например, с помощью [builder.sh](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/async/docker/builder.sh), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
+
+[Инструкции по установке](https://github.com/git-lfs/git-lfs#installing)
+
+После чего клонировать: `git lfs clone`
+
+---
+
 ### Обновления проекта
 
 | Дата | Значение accuracy | Изменение | 
