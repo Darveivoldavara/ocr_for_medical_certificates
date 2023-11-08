@@ -163,9 +163,9 @@ def assembly(lst):
             str(donation_type)
           )
         ) and i+1 < len(lst) and (
-            re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$', is_paid) or
-            re.match(r'^[\W_]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$', is_paid) or
-            re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', is_paid)
+            re.match(r'^\w{1,2}[\W_]?\w{,2}[\W_]?\w{,4}[\W_]?$', str(is_paid)) or
+            re.match(r'^[\W_]*\d{2}[\W_]*(\d{2}|\d{4})[\W_]*$', str(is_paid)) or
+            re.match(r'^[\W_]*(\d{2}|\d{4})[\W_]*$', str(is_paid))
         ):
             i -= 2
             continue

@@ -45,7 +45,9 @@
 
 [Инструкции по установке](https://github.com/git-lfs/git-lfs#installing)
 
-После чего клонировать: `git lfs clone`
+Далее однократно настроить Git LFS для своей учетной записи: `git lfs install`
+
+После чего можно клонировать репозиторий, как обычно `git clone https://github.com/Darveivoldavara/ocr_for_medical_certificates.git`
 
 ---
 
