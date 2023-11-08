@@ -13,7 +13,11 @@
 
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.91**.
 
-Описание работы и тестирование, в том числе с интерактивным графиком, можно увидеть в [Jupiter-тетрадке](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/6714f0dfc44e341a01c33353a9cf2db2719aa032/Doctr/ocr_for_medical_certificates.ipynb) на nbviewer.
+Описания работы и тестирования, в том числе с интерактивными графиками, можно увидеть в Jupiter-тетрадкеах на nbviewer:
+
+[OCR](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/6714f0dfc44e341a01c33353a9cf2db2719aa032/Doctr/ocr_for_medical_certificates.ipynb)
+
+[Классификация](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/712c639362d1ced47b364f3e92a98b8f0d621017/notebooks/certificates_classifier.ipynb)
 
 ---
 
@@ -31,17 +35,31 @@
 
 Запустить:
 
-[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/async/docker/docker-compose.yml).
+[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker/docker-compose.yml).
 
 ---
 
 ### Клонирование репозитория
 
-Если потребуется собирать самостоятельно образы, например, с помощью [builder.sh](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/async/docker/builder.sh), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
+Если потребуется собирать самостоятельно образы, например, с помощью [builder.sh](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker/builder.sh), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
 
 [Инструкции по установке](https://github.com/git-lfs/git-lfs#installing)
 
-После чего клонировать: `git lfs clone`
+Далее однократно настроить Git LFS для своей учетной записи: `git lfs install`
+
+После чего можно клонировать репозиторий, как обычно:
+
+`git clone https://github.com/Darveivoldavara/ocr_for_medical_certificates.git`
+
+---
+
+### Handlers (ручки запросов)
+
+- Для отправки изображения в очередь (post-запрос) — `/ocr` — подгружает фотографию в сервис и возвращает task_id для использования в get-запросе
+  - Пример отправки в сервис вашего конкретного изображения, находящегося по пути *path_to_your_image.jpg* —
+
+    `curl -X POST -F "file=@path_to_your_image.jpg" http://localhost:8000/ocr`
+- Для получения результата распознавания (get-запрос) — `/result/{task_id}` — возвращает результат в формате JSON
 
 ---
 
