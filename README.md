@@ -35,13 +35,13 @@
 
 Запустить:
 
-[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker/docker-compose.yml).
+[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/test/docker-compose.yml).
 
 ---
 
 ### Клонирование репозитория
 
-Если потребуется собирать самостоятельно образы, например, с помощью [builder.sh](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker/builder.sh), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
+Если потребуется самостоятельно собрать / запустить образы (с помощью `docker-compose build` / `docker-compose up`), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
 
 [Инструкции по установке](https://github.com/git-lfs/git-lfs#installing)
 
