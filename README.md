@@ -13,7 +13,7 @@
 
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.91**.
 
-Описания работы и тестирования, в том числе с интерактивными графиками, можно увидеть в Jupiter-тетрадкеах на nbviewer:
+Описания работы и тестирования, в том числе с интерактивными графиками, можно увидеть в Jupiter-тетрадках на nbviewer:
 
 [OCR](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/6714f0dfc44e341a01c33353a9cf2db2719aa032/Doctr/ocr_for_medical_certificates.ipynb)
 
@@ -35,13 +35,13 @@
 
 Запустить:
 
-[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker/docker-compose.yml).
+[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/test/docker-compose.yml).
 
 ---
 
 ### Клонирование репозитория
 
-Если потребуется собирать самостоятельно образы, например, с помощью [builder.sh](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker/builder.sh), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
+Если потребуется самостоятельно собрать / запустить образы (с помощью `docker-compose build` / `docker-compose up`), то при клонировании репозитория необходимо использовать [Git LFS](https://git-lfs.com/) для корректной загрузки моделей. Сначала установить:
 
 [Инструкции по установке](https://github.com/git-lfs/git-lfs#installing)
 
@@ -74,6 +74,7 @@
 | **16.07.2023** | **0.91** | **финальный дебаг скрипта** |
 | **17.08.2023** | **0.91** | **реализована асинхронная работа сервиса** |
 | **04.09.2023** | **0.91** | **добавлена частичная классификация справок на входе** |
+| **08.11.2023** | **0.91** | **оптимизирована файловая структура и сборка контейнера; дебаг обработки некоторых изображений** |
 
 ---
 

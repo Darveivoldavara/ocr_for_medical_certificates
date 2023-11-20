@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    hostname: ocr_web
+    container_name: ocr_web
+    image: darveivoldavara/ocr_for_medical_certificates:web
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - redis
+    env_file: environment/.env
+    volumes:
+      - app-data:/app/img
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  worker:
+    hostname: ocr_worker
+    container_name: ocr_worker
+    image: darveivoldavara/ocr_for_medical_certificates:worker
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - redis
+    env_file: environment/.env
+    volumes:
+      - app-data:/app/img
+    command: ["celery", "-A", "app.celery_app", "worker", "--loglevel=info"]
+      
+  redis:
+    hostname: ocr_redis
+    container_name: ocr_redis
+    image: redis:alpine
+    restart: unless-stopped
+    command: ["redis-server"]
+
+volumes:
+  app-data:

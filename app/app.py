@@ -17,65 +17,48 @@ import table_assembly
 from net import Net
 
 
+MODEL_PATH = os.environ.get("MODEL_PATH", "/app/models")
 REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL", "redis://redis:6379/0")
 REDIS_BACKEND_URL = os.environ.get("REDIS_BACKEND_URL", "redis://redis")
 
 app = FastAPI()
-celery_app = Celery("worker", broker=REDIS_BROKER_URL,
-                    backend=REDIS_BACKEND_URL)
+celery_app = Celery("worker", broker=REDIS_BROKER_URL, backend=REDIS_BACKEND_URL)
 celery_app.conf.update({"worker_hijack_root_logger": False})
 allowed_extensions = ["jpg", "jpeg", "png", "raw", "psd", "bmp"]
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler = logging.FileHandler("logs.log", mode="w")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
-try:
-    model = pickle.load(open(
-        os.path.join(os.path.dirname(__file__), "model.pkl"), "rb"
-    ))
-    logging.info("Model loaded successfully")
-except Exception as e:
-    logging.error(f"Error while loading model: {e}")
-    raise e
+def load_model(file_name):
+    with open(os.path.join(MODEL_PATH, file_name), "rb") as file:
+        return pickle.load(file)
+
 
 try:
-    encoder = pickle.load(open(
-        os.path.join(os.path.dirname(__file__), "beit_encoder.pkl"), "rb"
-    ))
-    logging.info("Encoder loaded successfully")
+    model = load_model("model.pkl")
+    encoder = load_model("beit_encoder.pkl")
+    classifier = load_model("skorch_ffnn_classifier.pkl")
 except Exception as e:
-    logging.error(f"Error while loading encoder: {e}")
-    raise e
-
-try:
-    classifier = pickle.load(open(
-        os.path.join(os.path.dirname(__file__), "skorch_ffnn_classifier.pkl"),
-        "rb"
-    ))
-    logging.info("Classifier loaded successfully")
-except Exception as e:
-    logging.error(f"Error while loading classifier: {e}")
+    logging.error(f"Error while loading .pkl file: {e}")
     raise e
 
 
 def obtaining_embedding(img_path):
-    preprocess = transforms.Compose([
-        transforms.Resize(384),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.5, 0.5, 0.5],
-            std=[0.5, 0.5, 0.5]
-        )
-    ])
-    image = Image.open(img_path).convert('RGB')
+    preprocess = transforms.Compose(
+        [
+            transforms.Resize(384),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        ]
+    )
+    image = Image.open(img_path).convert("RGB")
     image = preprocess(image).unsqueeze(0)
     with torch.no_grad():
         output = encoder(image)
@@ -106,16 +89,19 @@ def process_request(file: UploadFile):
     file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
     if file_ext not in allowed_extensions:
         logging.warning(
-            f'{file.filename} has an unsupported format. Allowed formats are: {", ".join(allowed_extensions)}')
-        return f"Wrong file format. Allowed formats are: {', '.join(allowed_extensions)}"
+            f'{file.filename} has an unsupported format. Allowed formats are: {", ".join(allowed_extensions)}'
+        )
+        return (
+            f"Wrong file format. Allowed formats are: {', '.join(allowed_extensions)}"
+        )
     logging.info(f"Received file: {file.filename}")
 
     save_path = os.path.join(os.path.dirname(__file__), "img", file.filename)
     with open(save_path, "wb") as fid:
         fid.write(file.file.read())
-    if not classifier.predict(obtaining_embedding(save_path))[0]:
-        logging.warning(
-            f"The uploaded image is not a medical certificate of form 405. The service only works with them")
+    if not classifier.predict(obtaining_embedding(save_path))[0]:        logging.warning(
+            f"The uploaded image is not a medical certificate of form 405. The service only works with them"
+        )
         return f"The uploaded image is not a medical certificate of form 405. The service only works with them"
 
     task = process_file.delay(save_path, file_name)
@@ -131,7 +117,8 @@ def get_result(task_id: str):
         return task.result
     else:
         logging.warning(
-            f"Task {task_id} is not completed yet, current state: {task.state}")
+            f"Task {task_id} is not completed yet, current state: {task.state}"
+        )
         return {"status": task.state}
 
 
@@ -148,26 +135,26 @@ def process_file(file_path: str, file_name: str):
                     lst.append(w["value"])
 
         df = table_assembly.assembly(lst)
-        df[[
-            "blood_station_id",
-            "plan_date",
-            "email",
-            "is_out",
-            "volume",
-            "payment_cost",
-            "city_id",
-            "first_name",
-            "middle_name",
-            "last_name"
-        ]] = ""
+        df[
+            [
+                "blood_station_id",
+                "plan_date",
+                "email",
+                "is_out",
+                "volume",
+                "payment_cost",
+                "city_id",
+                "first_name",
+                "middle_name",
+                "last_name",
+            ]
+        ] = ""
         df["image_id"] = file_name
         df["with_image"] = True
 
-        logging.info(
-            f'Result: {df.to_json(orient="records", force_ascii=False)}')
+        logging.info(f'Result: {df.to_json(orient="records", force_ascii=False)}')
 
-        return df.to_json(orient="records",
-                          force_ascii=False)
+        return df.to_json(orient="records", force_ascii=False)
     except Exception as e:
         logging.error(f"Error while processing file: {e}")
         raise e
