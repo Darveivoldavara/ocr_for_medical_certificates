@@ -2,12 +2,7 @@ from torch import nn
 
 
 class Net(nn.Module):
-    def __init__(
-        self,
-        n_hidden_neurons=138,
-        n_in_neurons=768,
-        n_out_neurons=1
-    ):
+    def __init__(self, n_hidden_neurons=138, n_in_neurons=768, n_out_neurons=1):
         super().__init__()
 
         self.fc1 = nn.Linear(n_in_neurons, n_hidden_neurons)

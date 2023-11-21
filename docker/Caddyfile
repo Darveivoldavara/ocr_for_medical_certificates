@@ -1,0 +1,18 @@
+{$DOMAIN_NAME:localhost} {
+    basicauth / {
+        {$CADDY_USERNAME} {$CADDY_PASSWORD}
+    }
+    header Strict-Transport-Security max-age=31536000;
+    header -Server
+    header /robots.txt {
+        User-agent *
+        Disallow /
+    }
+    handle {
+        reverse_proxy ocr_web:8000
+    }
+    encode gzip
+    log {
+        output stdout
+    }
+}

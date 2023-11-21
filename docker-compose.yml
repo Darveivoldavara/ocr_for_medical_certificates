@@ -1,12 +1,24 @@
 version: '3.8'
 
 services:
+  caddy:
+    hostname: ocr_caddy
+    container_name: ocr_caddy
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file: environment/.env
+    volumes:
+      - $PWD/docker/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
   web:
     hostname: ocr_web
     container_name: ocr_web
-    image: darveivoldavara/ocr_for_medical_certificates:web
-    ports:
-      - "8000:8000"
+    image: medical_certificates:web
     restart: unless-stopped
     build:
       context: .
@@ -16,12 +28,12 @@ services:
     env_file: environment/.env
     volumes:
       - app-data:/app/img
-    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["gunicorn", "app:fastapi_app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
 
   worker:
     hostname: ocr_worker
     container_name: ocr_worker
-    image: darveivoldavara/ocr_for_medical_certificates:worker
+    image: medical_certificates:worker
     restart: unless-stopped
     build:
       context: .
@@ -31,7 +43,7 @@ services:
     env_file: environment/.env
     volumes:
       - app-data:/app/img
-    command: ["celery", "-A", "app.celery_app", "worker", "--loglevel=info"]
+    command: ["celery", "-A", "app.celery_app", "worker"]
       
   redis:
     hostname: ocr_redis
@@ -42,3 +54,5 @@ services:
 
 volumes:
   app-data:
+  caddy_data:
+  caddy_config:
