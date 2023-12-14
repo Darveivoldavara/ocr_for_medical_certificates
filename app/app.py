@@ -15,6 +15,7 @@ from fastapi.responses import HTMLResponse
 
 import table_assembly
 from net import Net
+from orientation_net import OrientationNet
 
 
 MODEL_PATH = os.environ.get("MODEL_PATH", "/app/models")
@@ -44,6 +45,7 @@ try:
     model = load_model("model.pkl")
     encoder = load_model("beit_encoder.pkl")
     classifier = load_model("skorch_ffnn_classifier.pkl")
+    orient_classifier = load_model("skorch_orientation_classifier.pkl")
 except Exception as e:
     logging.error(f"Error while loading .pkl file: {e}")
     raise e
@@ -64,6 +66,16 @@ def obtaining_embedding(img_path):
         output = encoder(image)
         embedding = output[0][:, 0, :]
     return embedding
+
+
+def rotate_image(image, orientation):
+    if orientation == 1:
+        return image.rotate(90, expand=True)
+    elif orientation == 2:
+        return image.rotate(-90, expand=True)
+    elif orientation == 3:
+        return image.rotate(180, expand=True)
+    return image
 
 
 @app.get("/")
@@ -99,6 +111,12 @@ def process_request(file: UploadFile):
     save_path = os.path.join(os.path.dirname(__file__), "img", file.filename)
     with open(save_path, "wb") as fid:
         fid.write(file.file.read())
+
+    orientation = orient_classifier.predict(obtaining_embedding(save_path))[0]
+    with Image.open(save_path) as img:
+        corrected_img = rotate_image(img, orientation)
+        corrected_img.save(save_path)
+
     if not classifier.predict(obtaining_embedding(save_path))[0]:
         logging.warning(
             f"The uploaded image is not a medical certificate of form 405. The service only works with them"
