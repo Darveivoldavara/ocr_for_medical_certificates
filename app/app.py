@@ -45,7 +45,7 @@ try:
     model = load_model("model.pkl")
     encoder = load_model("beit_encoder.pkl")
     classifier = load_model("skorch_ffnn_classifier.pkl")
-    orient_classifier = load_model("skorch_orientation_classifier.pkl")
+    orient_classifier = load_model("orientation_classifier.pkl")
 except Exception as e:
     logging.error(f"Error while loading .pkl file: {e}")
     raise e
