@@ -11,6 +11,8 @@ from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException
 from celery import Celery
 
 import table_assembly
+from net import Net
+from orientation_net import OrientationNet
 
 fastapi_app = FastAPI()
 
@@ -32,6 +34,7 @@ try:
     model = load_model("model.pkl")
     encoder = load_model("beit_encoder.pkl")
     classifier = load_model("skorch_ffnn_classifier.pkl")
+    orient_classifier = load_model("orientation_classifier.pkl")
 except (FileNotFoundError, IOError) as e:
     raise e
 
@@ -53,6 +56,16 @@ def obtaining_embedding(img_path):
     return embedding
 
 
+def rotate_image(image, orientation):
+    if orientation == 1:
+        return image.rotate(90, expand=True)
+    elif orientation == 2:
+        return image.rotate(-90, expand=True)
+    elif orientation == 3:
+        return image.rotate(180, expand=True)
+    return image
+
+
 @fastapi_app.post("/upload")
 def upload(file: UploadFile):
     if not file.file:
@@ -71,6 +84,11 @@ def upload(file: UploadFile):
 
     with open(save_path, "wb") as file_object:
         file_object.write(file.file.read())
+
+    orientation = orient_classifier.predict(obtaining_embedding(save_path))[0]
+    with Image.open(save_path) as img:
+        corrected_img = rotate_image(img, orientation)
+        corrected_img.save(save_path)
 
     if not classifier.predict(obtaining_embedding(save_path))[0]:
         raise HTTPException(status_code=400, detail="Incorrect file type")
@@ -95,10 +113,7 @@ def process_file(file_path: str):
         result = model(image)
         jsn = result.pages[0].export()
         lst = [
-            w["value"]
-            for b in jsn["blocks"]
-            for l in b["lines"]
-            for w in l["words"]
+            w["value"] for b in jsn["blocks"] for l in b["lines"] for w in l["words"]
         ]
         df = table_assembly.assembly(lst)
 
