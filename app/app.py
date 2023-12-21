@@ -14,7 +14,8 @@ from fastapi import FastAPI, File, UploadFile, Form, Depends
 from fastapi.responses import HTMLResponse
 
 import table_assembly
-from nets import Net, OrientationNet
+from net import Net
+from orientation_net import OrientationNet
 
 
 MODEL_PATH = os.environ.get("MODEL_PATH", "/app/models")
