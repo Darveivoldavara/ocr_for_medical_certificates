@@ -113,8 +113,6 @@ def upload(file: UploadFile):
             status_code=400,
             detail="Incorrect file extension. Allowed formats are: {ALLOWED_EXTENSION}",
         )
-    logging.info(f"Received file: {file.filename}")
-
     unique_filename = f"{uuid4()}.{file_ext}"
     save_path = os.path.join(os.path.dirname(__file__), "img", unique_filename)
 
@@ -131,7 +129,6 @@ def upload(file: UploadFile):
             status_code=400,
             detail="Incorrect file type. The service only works with certificate of form 405",
         )
-
     task = process_file.delay(save_path, file_name)
     return {"task_id": task.id}
 
