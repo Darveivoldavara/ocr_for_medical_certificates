@@ -1,7 +1,8 @@
 import os
 import logging
 import pickle
-from typing import List
+import json
+from uuid import uuid4
 
 from PIL import Image
 import torch
@@ -10,22 +11,22 @@ from torchvision import transforms
 from doctr.io import DocumentFile
 from celery import Celery
 from celery.signals import setup_logging
-from fastapi import FastAPI, File, UploadFile, Form, Depends
+from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 
 import table_assembly
 from net import Net
 from orientation_net import OrientationNet
 
+fastapi_app = FastAPI()
 
-MODEL_PATH = os.environ.get("MODEL_PATH", "/app/models")
-REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL", "redis://redis:6379/0")
-REDIS_BACKEND_URL = os.environ.get("REDIS_BACKEND_URL", "redis://redis")
+REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL")
+REDIS_BACKEND_URL = os.environ.get("REDIS_BACKEND_URL")
+ALLOWED_EXTENSION = os.getenv("ALLOWED_EXTENSION").split()
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "models")
 
-app = FastAPI()
 celery_app = Celery("worker", broker=REDIS_BROKER_URL, backend=REDIS_BACKEND_URL)
 celery_app.conf.update({"worker_hijack_root_logger": False})
-allowed_extensions = ["jpg", "jpeg", "png", "raw", "psd", "bmp"]
 
 
 logger = logging.getLogger()
@@ -46,8 +47,7 @@ try:
     encoder = load_model("beit_encoder.pkl")
     classifier = load_model("skorch_ffnn_classifier.pkl")
     orient_classifier = load_model("orientation_classifier.pkl")
-except Exception as e:
-    logging.error(f"Error while loading .pkl file: {e}")
+except (FileNotFoundError, IOError) as e:
     raise e
 
 
@@ -78,7 +78,7 @@ def rotate_image(image, orientation):
     return image
 
 
-@app.get("/")
+@fastapi_app.get("/")
 def main():
     html_content = """
             <body>
@@ -91,26 +91,35 @@ def main():
     return HTMLResponse(content=html_content)
 
 
-@app.get("/health")
+@fastapi_app.get("/health")
 def health():
     return {"status": "OK"}
 
 
-@app.post("/ocr")
-def process_request(file: UploadFile):
-    file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
-    if file_ext not in allowed_extensions:
-        logging.warning(
-            f'{file.filename} has an unsupported format. Allowed formats are: {", ".join(allowed_extensions)}'
+@fastapi_app.post("/upload")
+def upload(file: UploadFile):
+    if not file.file:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    if "." not in file.filename:
+        raise HTTPException(
+            status_code=400, detail="No file extension found. Check file name"
         )
-        return (
-            f"Wrong file format. Allowed formats are: {', '.join(allowed_extensions)}"
+
+    file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
+
+    if file_ext.lower() not in ALLOWED_EXTENSION:
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect file extension. Allowed formats are: {ALLOWED_EXTENSION}",
         )
     logging.info(f"Received file: {file.filename}")
 
-    save_path = os.path.join(os.path.dirname(__file__), "img", file.filename)
-    with open(save_path, "wb") as fid:
-        fid.write(file.file.read())
+    unique_filename = f"{uuid4()}.{file_ext}"
+    save_path = os.path.join(os.path.dirname(__file__), "img", unique_filename)
+
+    with open(save_path, "wb") as file_object:
+        file_object.write(file.file.read())
 
     orientation = orient_classifier.predict(obtaining_embedding(save_path))[0]
     with Image.open(save_path) as img:
@@ -118,62 +127,39 @@ def process_request(file: UploadFile):
         corrected_img.save(save_path)
 
     if not classifier.predict(obtaining_embedding(save_path))[0]:
-        logging.warning(
-            f"The uploaded image is not a medical certificate of form 405. The service only works with them"
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect file type. The service only works with certificate of form 405",
         )
-        return f"The uploaded image is not a medical certificate of form 405. The service only works with them"
 
     task = process_file.delay(save_path, file_name)
-    logging.info(f"Task {task.id} sent to Celery")
     return {"task_id": task.id}
 
 
-@app.get("/result/{task_id}")
+@fastapi_app.get("/result/{task_id}")
 def get_result(task_id: str):
     task = celery_app.AsyncResult(task_id)
     if task.state == "SUCCESS":
-        logging.info(f"Task {task_id} completed successfully")
-        return task.result
+        return {"status": "success", "result": json.loads(task.result)}
     else:
-        logging.warning(
-            f"Task {task_id} is not completed yet, current state: {task.state}"
-        )
         return {"status": task.state}
 
 
 @celery_app.task(name="process_file")
-def process_file(file_path: str, file_name: str):
+def process_file(file_path: str):
     try:
         image = DocumentFile.from_images(file_path)
         result = model(image)
         jsn = result.pages[0].export()
-        lst = []
-        for b in jsn["blocks"]:
-            for l in b["lines"]:
-                for w in l["words"]:
-                    lst.append(w["value"])
-
+        lst = [
+            w["value"] for b in jsn["blocks"] for l in b["lines"] for w in l["words"]
+        ]
         df = table_assembly.assembly(lst)
-        df[
-            [
-                "blood_station_id",
-                "plan_date",
-                "email",
-                "is_out",
-                "volume",
-                "payment_cost",
-                "city_id",
-                "first_name",
-                "middle_name",
-                "last_name",
-            ]
-        ] = ""
-        df["image_id"] = file_name
-        df["with_image"] = True
 
-        logging.info(f'Result: {df.to_json(orient="records", force_ascii=False)}')
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
         return df.to_json(orient="records", force_ascii=False)
-    except Exception as e:
-        logging.error(f"Error while processing file: {e}")
-        raise e
+
+    except Exception as exc:
+        raise exc
