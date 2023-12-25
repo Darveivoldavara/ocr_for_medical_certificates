@@ -13,11 +13,15 @@
 
 Качество решения в рамках метрики *accuracy* по отдельным ячейкам составляет **0.91**.
 
+Качество классификаций по формам справок и по их ориентациям составляет **0.93** для метрики *F-1*.
+
 Описания работы и тестирования, в том числе с интерактивными графиками, можно увидеть в Jupiter-тетрадках на nbviewer:
 
 [OCR](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/6714f0dfc44e341a01c33353a9cf2db2719aa032/Doctr/ocr_for_medical_certificates.ipynb)
 
-[Классификация](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/712c639362d1ced47b364f3e92a98b8f0d621017/notebooks/certificates_classifier.ipynb)
+[Классификация типа справки](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/712c639362d1ced47b364f3e92a98b8f0d621017/notebooks/certificates_classifier.ipynb)
+
+[Классификация ориентации изображения](https://nbviewer.org/github/Darveivoldavara/ocr_for_medical_certificates/blob/a5cc34726f549cf390668915e027d6213cbbab3e/notebooks/orientation_classifier.ipynb)
 
 ---
 
@@ -35,7 +39,7 @@
 
 Запустить:
 
-[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/tree/test/docker-compose.yml).
+[Compose-файл для самостоятельной сборки](https://github.com/Darveivoldavara/ocr_for_medical_certificates/blob/main/docker-compose.yml).
 
 ---
 
@@ -55,10 +59,10 @@
 
 ### Handlers (ручки запросов)
 
-- Для отправки изображения в очередь (post-запрос) — `/ocr` — подгружает фотографию в сервис и возвращает task_id для использования в get-запросе
+- Для отправки изображения в очередь (post-запрос) — `/upload` — подгружает фотографию в сервис и возвращает task_id для использования в get-запросе
   - Пример отправки в сервис вашего конкретного изображения, находящегося по пути *path_to_your_image.jpg* —
 
-    `curl -X POST -F "file=@path_to_your_image.jpg" http://localhost:8000/ocr`
+    `curl -X POST -F "file=@path_to_your_image.jpg" http://localhost:8000/upload`
 - Для получения результата распознавания (get-запрос) — `/result/{task_id}` — возвращает результат в формате JSON
 
 ---
@@ -75,6 +79,7 @@
 | **17.08.2023** | **0.91** | **реализована асинхронная работа сервиса** |
 | **04.09.2023** | **0.91** | **добавлена частичная классификация справок на входе** |
 | **08.11.2023** | **0.91** | **оптимизирована файловая структура и сборка контейнера; дебаг обработки некоторых изображений** |
+| **21.12.2023** | **0.91** | **внедрена обработка повёрнутых изображений** |
 
 ---
 
