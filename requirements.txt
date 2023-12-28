@@ -10,3 +10,4 @@ rapidfuzz==2.15.1
 celery[redis]==5.3.1
 redis==5.0.0
 python-multipart==0.0.6
+gunicorn==21.2.0
