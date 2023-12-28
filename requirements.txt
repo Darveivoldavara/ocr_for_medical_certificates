@@ -1,7 +1,7 @@
 pandas==1.4.1
-Pillow==9.5.0
+Pillow==10.0.1
 skorch==0.12.1
-transformers==4.25.1
+transformers==4.36.0
 python-doctr[torch]==0.6.0
 uvicorn==0.23.0
 fastapi==0.100.0
@@ -10,3 +10,4 @@ rapidfuzz==2.15.1
 celery[redis]==5.3.1
 redis==5.0.0
 python-multipart==0.0.6
+gunicorn==21.2.0
