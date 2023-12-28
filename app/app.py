@@ -82,7 +82,7 @@ def rotate_image(image, orientation):
 def main():
     html_content = """
             <body>
-            <form action="/ocr" enctype="multipart/form-data" method="post">
+            <form action="/upload" enctype="multipart/form-data" method="post">
             <input name="file" type="file">
             <input type="submit">
             </form>
@@ -129,7 +129,7 @@ def upload(file: UploadFile):
             status_code=400,
             detail="Incorrect file type. The service only works with certificate of form 405",
         )
-    task = process_file.delay(save_path, file_name)
+    task = process_file.delay(save_path)
     return {"task_id": task.id}
 
 
