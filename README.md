@@ -33,8 +33,6 @@
 
 `docker pull darveivoldavara/ocr_for_medical_certificates:web`
 
-`docker pull darveivoldavara/ocr_for_medical_certificates:redis`
-
 `docker pull darveivoldavara/ocr_for_medical_certificates:worker`
 
 Запустить:
