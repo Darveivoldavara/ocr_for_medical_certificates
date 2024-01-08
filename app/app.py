@@ -106,7 +106,7 @@ def upload(file: UploadFile):
             status_code=400, detail="No file extension found. Check file name"
         )
 
-    file_name, file_ext = file.filename.rsplit(".", maxsplit=1)
+    file_ext = file.filename.rsplit(".", maxsplit=1)[1]
 
     if file_ext.lower() not in ALLOWED_EXTENSION:
         raise HTTPException(

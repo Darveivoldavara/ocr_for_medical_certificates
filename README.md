@@ -60,7 +60,7 @@
 - Для отправки изображения в очередь (post-запрос) — `/upload` — подгружает фотографию в сервис и возвращает task_id для использования в get-запросе
   - Пример отправки в сервис вашего конкретного изображения, находящегося по пути *path_to_your_image.jpg* —
 
-    `curl -X POST -F "file=@path_to_your_image.jpg" http://localhost:8000/upload`
+    `curl -X GET -F "file=@path_to_your_image.jpg" http://localhost:8000/`
 - Для получения результата распознавания (get-запрос) — `/result/{task_id}` — возвращает результат в формате JSON
 
 ---
