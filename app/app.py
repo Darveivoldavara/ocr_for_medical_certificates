@@ -95,6 +95,8 @@ def clean_json(input_json: str) -> str:
             # Определяем формат и преобразуем дату
             if "." in date_str:
                 return datetime.strptime(date_str, "%m.%d.%Y").strftime("%Y-%m-%d")
+            else:
+                return date_str
         except:
             return None  # Возвращаем None, если формат некорректный
         
