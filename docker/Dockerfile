@@ -5,7 +5,7 @@ WORKDIR /app
 COPY /requirements.txt /app
 COPY /third_party_licenses.md /app
 
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install ffmpeg -y && rm -rf /var/lib/apt/lists/*
 RUN pip install \
     --default-timeout=100 \
     torch==2.2.0 \
